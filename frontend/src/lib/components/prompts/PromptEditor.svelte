@@ -110,7 +110,7 @@
 					<textarea
 						id="prompt-content"
 						class="ql-input content-textarea"
-						placeholder="You are a helpful assistant. User context: {{user_context}}"
+						placeholder="You are a helpful assistant. User context: &#123;&#123;user_context&#125;&#125;"
 						bind:value={content}
 						required
 					></textarea>

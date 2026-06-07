@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "setup": "cd frontend && npm ci && npm run build && cd ../backend && go mod download",
+    "run": "cd backend && PORT=${CONDUCTOR_PORT:-8000} go run main.go",
+    "archive": "rm -f backend/quicklens.db backend/quicklens.db-shm backend/quicklens.db-wal"
+  },
+  "runScriptMode": "concurrent"
+}

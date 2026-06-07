@@ -5,6 +5,7 @@ export interface Prompt {
 	name: string;
 	content: string;
 	model?: string;
+	model_id?: string;
 	version: number;
 	tags: string[];
 	created_at: string;
@@ -13,6 +14,7 @@ export interface Prompt {
 }
 
 export interface PromptVersion {
+	id: string;
 	version: number;
 	content: string;
 	created_at: string;
@@ -22,6 +24,7 @@ export interface CreatePromptData {
 	name: string;
 	content: string;
 	model?: string;
+	model_id?: string;
 	tags?: string[];
 }
 

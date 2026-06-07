@@ -44,6 +44,7 @@ export function searchLogs(params?: LogSearchParams): Promise<LogEntry[]> {
 		if (params.status !== undefined && params.status !== '') searchParams.set('status', params.status);
 		if (params.min_latency !== undefined) searchParams.set('min_latency', String(params.min_latency));
 		if (params.max_latency !== undefined) searchParams.set('max_latency', String(params.max_latency));
+		if (params.search !== undefined && params.search !== '') searchParams.set('search', params.search);
 	}
 	const query = searchParams.toString();
 	return apiGet<LogEntry[]>(`/api/v1/logs${query ? `?${query}` : ''}`);

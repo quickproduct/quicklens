@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
@@ -38,6 +39,58 @@ func GetDashboardHandler(w http.ResponseWriter, r *http.Request) {
 	// Models online / total
 	db.DB.QueryRow("SELECT COUNT(*) FROM models WHERE status = 'online'").Scan(&resp.ModelsOnline)
 	db.DB.QueryRow("SELECT COUNT(*) FROM models").Scan(&resp.ModelsTotal)
+	db.DB.QueryRow("SELECT COUNT(*) FROM alerts WHERE acknowledged = 0 AND severity = 'critical' AND status != 'resolved'").Scan(&resp.CriticalAlertCount)
+	db.DB.QueryRow("SELECT COUNT(*) FROM incidents WHERE status != 'resolved'").Scan(&resp.ActiveIncidentCount)
+
+	var latestTraceAt sql.NullTime
+	db.DB.QueryRow("SELECT MAX(created_at) FROM traces").Scan(&latestTraceAt)
+	resp.LastUpdatedAt = now.Format(time.RFC3339)
+	if latestTraceAt.Valid {
+		resp.DataFreshnessSeconds = int(now.Sub(latestTraceAt.Time).Seconds())
+		if resp.DataFreshnessSeconds < 0 {
+			resp.DataFreshnessSeconds = 0
+		}
+	} else {
+		resp.DataFreshnessSeconds = 0
+	}
+
+	healthPenalty := resp.CriticalAlertCount*18 + resp.ActiveIncidentCount*12
+	if resp.ModelsTotal > 0 {
+		offlineModels := resp.ModelsTotal - resp.ModelsOnline
+		healthPenalty += offlineModels * 8
+	}
+	resp.HealthScore = 100 - healthPenalty
+	if resp.HealthScore < 0 {
+		resp.HealthScore = 0
+	}
+
+	var totalToday, okToday int64
+	db.DB.QueryRow("SELECT COALESCE(COUNT(*), 0) FROM traces WHERE created_at >= ?", startOfDay).Scan(&totalToday)
+	db.DB.QueryRow("SELECT COALESCE(COUNT(*), 0) FROM traces WHERE created_at >= ? AND status != 'error'", startOfDay).Scan(&okToday)
+	attainment := 100.0
+	if totalToday > 0 {
+		attainment = float64(okToday) / float64(totalToday) * 100
+	}
+	budget := 100.0
+	target := 99.0
+	if attainment < target {
+		budget = 0
+	} else if target < 100 {
+		budget = (attainment - target) / (100 - target) * 100
+	}
+	status := "healthy"
+	if budget <= 0 || resp.CriticalAlertCount > 0 {
+		status = "critical"
+	} else if budget < 25 || resp.ActiveIncidentCount > 0 {
+		status = "warning"
+	}
+	resp.SLOBurnSummary = models.SLOBurnSummary{
+		TargetPercent:        target,
+		AttainmentPercent:    attainment,
+		ErrorBudgetRemaining: budget,
+		BurnRate:             100 - budget,
+		Status:               status,
+	}
 
 	// Token time series - hourly buckets last 24h
 	resp.TokenTimeSeries = make([]models.TimeSeriesPoint, 0)
@@ -132,18 +185,34 @@ func GetDashboardHandler(w http.ResponseWriter, r *http.Request) {
 	// Active (unacknowledged) alerts
 	resp.ActiveAlerts = make([]models.AlertResponse, 0)
 	alertRows, err := db.DB.Query(`
-		SELECT id, rule_id, severity, message, acknowledged, created_at
+		SELECT id, rule_id, severity, message, acknowledged, status, owner_id, service_id,
+		       model_id, incident_id, dedupe_key, runbook_url, last_seen_at, resolved_at, created_at
 		FROM alerts
-		WHERE acknowledged = 0
-		ORDER BY created_at DESC
+		WHERE acknowledged = 0 AND status != 'resolved'
+		ORDER BY CASE severity WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END, created_at DESC
 		LIMIT 20
 	`)
 	if err == nil {
 		defer alertRows.Close()
 		for alertRows.Next() {
 			var a models.AlertResponse
+			var ruleID sql.NullString
+			var lastSeenAt, resolvedAt sql.NullTime
 			var createdAt time.Time
-			if err := alertRows.Scan(&a.ID, &a.RuleID, &a.Severity, &a.Message, &a.Acknowledged, &createdAt); err == nil {
+			if err := alertRows.Scan(
+				&a.ID, &ruleID, &a.Severity, &a.Message, &a.Acknowledged, &a.Status,
+				&a.OwnerID, &a.ServiceID, &a.ModelID, &a.IncidentID, &a.DedupeKey,
+				&a.RunbookURL, &lastSeenAt, &resolvedAt, &createdAt,
+			); err == nil {
+				if ruleID.Valid {
+					a.RuleID = &ruleID.String
+				}
+				if lastSeenAt.Valid {
+					a.LastSeenAt = &lastSeenAt.Time
+				}
+				if resolvedAt.Valid {
+					a.ResolvedAt = &resolvedAt.Time
+				}
 				a.CreatedAt = &createdAt
 				resp.ActiveAlerts = append(resp.ActiveAlerts, a)
 			}

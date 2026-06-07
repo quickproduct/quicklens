@@ -8,6 +8,7 @@ backend/quicklens-backend
 frontend/node_modules/
 frontend/.svelte-kit/
 frontend/build/
+backend/frontend/build/
 
 # Data
 *.db

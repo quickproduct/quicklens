@@ -6,6 +6,15 @@ export interface Alert {
 	severity: 'critical' | 'warning' | 'info';
 	message: string;
 	acknowledged: boolean;
+	status: string;
+	owner_id: string;
+	service_id: string;
+	model_id: string;
+	incident_id: string;
+	dedupe_key: string;
+	runbook_url: string;
+	last_seen_at: string | null;
+	resolved_at: string | null;
 	created_at: string;
 }
 

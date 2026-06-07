@@ -1,1 +1,0 @@
-import{h as o,g as l,i as m,E as v,j as y,s as f,k as p,l as i,H as T,m as g}from"./C-2RoMVy.js";import{B as A}from"./uekkk-lb.js";function k(d,_,s){var e;o&&(e=g,l());var r=new A(d);m(()=>{var a=_()??null;if(o){var h=y(e),c=h===T,u=a!==null;if(c!==u){var t=f();p(t),r.anchor=t,i(!1),r.ensure(a,a&&(n=>s(n,a))),i(!0);return}}r.ensure(a,a&&(n=>s(n,a)))},v)}export{k as c};

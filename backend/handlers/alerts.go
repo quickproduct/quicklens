@@ -14,9 +14,12 @@ import (
 
 func ListAlertsHandler(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.DB.Query(`
-		SELECT id, rule_id, severity, message, acknowledged, created_at
+		SELECT id, rule_id, severity, message, acknowledged, status, owner_id, service_id,
+		       model_id, incident_id, dedupe_key, runbook_url, last_seen_at, resolved_at, created_at
 		FROM alerts
-		ORDER BY created_at DESC
+		ORDER BY CASE status WHEN 'open' THEN 0 WHEN 'acknowledged' THEN 1 WHEN 'resolved' THEN 2 ELSE 3 END,
+		         CASE severity WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END,
+		         created_at DESC
 	`)
 	if err != nil {
 		log.Printf("Failed to query alerts: %v", err)
@@ -29,14 +32,25 @@ func ListAlertsHandler(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var a models.AlertResponse
 		var ruleID sql.NullString
+		var lastSeenAt, resolvedAt sql.NullTime
 		var createdAt time.Time
-		err := rows.Scan(&a.ID, &ruleID, &a.Severity, &a.Message, &a.Acknowledged, &createdAt)
+		err := rows.Scan(
+			&a.ID, &ruleID, &a.Severity, &a.Message, &a.Acknowledged, &a.Status,
+			&a.OwnerID, &a.ServiceID, &a.ModelID, &a.IncidentID, &a.DedupeKey,
+			&a.RunbookURL, &lastSeenAt, &resolvedAt, &createdAt,
+		)
 		if err != nil {
 			log.Printf("Failed to scan alert: %v", err)
 			continue
 		}
 		if ruleID.Valid {
 			a.RuleID = &ruleID.String
+		}
+		if lastSeenAt.Valid {
+			a.LastSeenAt = &lastSeenAt.Time
+		}
+		if resolvedAt.Valid {
+			a.ResolvedAt = &resolvedAt.Time
 		}
 		a.CreatedAt = &createdAt
 		result = append(result, a)
@@ -52,7 +66,7 @@ func AcknowledgeAlertHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := db.DB.Exec("UPDATE alerts SET acknowledged = 1 WHERE id = ?", alertID)
+	_, err := db.DB.Exec("UPDATE alerts SET acknowledged = 1, status = 'acknowledged' WHERE id = ?", alertID)
 	if err != nil {
 		log.Printf("Failed to acknowledge alert: %v", err)
 		WriteError(w, http.StatusInternalServerError, "Failed to acknowledge alert")
