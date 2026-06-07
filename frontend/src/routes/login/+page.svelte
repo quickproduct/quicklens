@@ -16,12 +16,8 @@
 		errorMsg = '';
 
 		try {
-			const success = await login(email, password);
-			if (success) {
-				addToast('Successfully logged in!', 'success');
-			} else {
-				errorMsg = 'Invalid email or password';
-			}
+			await login(email, password);
+			addToast('Successfully logged in!', 'success');
 		} catch (err) {
 			console.error(err);
 			errorMsg = 'Authentication failed. Please try again.';

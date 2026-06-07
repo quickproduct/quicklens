@@ -235,23 +235,124 @@ type AlertResponse struct {
 	Severity     string     `json:"severity"`
 	Message      string     `json:"message"`
 	Acknowledged bool       `json:"acknowledged"`
+	Status       string     `json:"status"`
+	OwnerID      string     `json:"owner_id"`
+	ServiceID    string     `json:"service_id"`
+	ModelID      string     `json:"model_id"`
+	IncidentID   string     `json:"incident_id"`
+	DedupeKey    string     `json:"dedupe_key"`
+	RunbookURL   string     `json:"runbook_url"`
+	LastSeenAt   *time.Time `json:"last_seen_at"`
+	ResolvedAt   *time.Time `json:"resolved_at"`
 	CreatedAt    *time.Time `json:"created_at"`
+}
+
+type IncidentResponse struct {
+	ID         string     `json:"id"`
+	Title      string     `json:"title"`
+	Severity   string     `json:"severity"`
+	Status     string     `json:"status"`
+	OwnerID    string     `json:"owner_id"`
+	ServiceID  string     `json:"service_id"`
+	ModelID    string     `json:"model_id"`
+	AlertID    string     `json:"alert_id"`
+	Summary    string     `json:"summary"`
+	RunbookURL string     `json:"runbook_url"`
+	StartedAt  *time.Time `json:"started_at"`
+	ResolvedAt *time.Time `json:"resolved_at"`
+	UpdatedAt  *time.Time `json:"updated_at"`
+	CreatedAt  *time.Time `json:"created_at"`
+	EventCount int        `json:"event_count"`
+}
+
+type IncidentCreateRequest struct {
+	Title      string `json:"title"`
+	Severity   string `json:"severity"`
+	OwnerID    string `json:"owner_id"`
+	ServiceID  string `json:"service_id"`
+	ModelID    string `json:"model_id"`
+	AlertID    string `json:"alert_id"`
+	Summary    string `json:"summary"`
+	RunbookURL string `json:"runbook_url"`
+}
+
+type IncidentUpdateRequest struct {
+	Status     *string `json:"status"`
+	OwnerID    *string `json:"owner_id"`
+	Summary    *string `json:"summary"`
+	RunbookURL *string `json:"runbook_url"`
+}
+
+type IncidentEventResponse struct {
+	ID         string     `json:"id"`
+	IncidentID string     `json:"incident_id"`
+	EventType  string     `json:"event_type"`
+	Message    string     `json:"message"`
+	ActorID    string     `json:"actor_id"`
+	CreatedAt  *time.Time `json:"created_at"`
+}
+
+type AuditLogResponse struct {
+	ID         string     `json:"id"`
+	ActorID    string     `json:"actor_id"`
+	Action     string     `json:"action"`
+	Resource   string     `json:"resource"`
+	ResourceID string     `json:"resource_id"`
+	Metadata   string     `json:"metadata"`
+	CreatedAt  *time.Time `json:"created_at"`
+}
+
+type SavedViewResponse struct {
+	ID        string     `json:"id"`
+	Name      string     `json:"name"`
+	Scope     string     `json:"scope"`
+	Filters   string     `json:"filters"`
+	IsShared  bool       `json:"is_shared"`
+	CreatedAt *time.Time `json:"created_at"`
+}
+
+type SLODefinitionResponse struct {
+	ID                   string     `json:"id"`
+	Name                 string     `json:"name"`
+	ServiceID            string     `json:"service_id"`
+	TargetPercent        float64    `json:"target_percent"`
+	PeriodDays           int        `json:"period_days"`
+	GoodEvents           int64      `json:"good_events"`
+	TotalEvents          int64      `json:"total_events"`
+	ErrorBudgetRemaining float64    `json:"error_budget_remaining"`
+	BurnRate             float64    `json:"burn_rate"`
+	Status               string     `json:"status"`
+	CreatedAt            *time.Time `json:"created_at"`
+}
+
+type SLOBurnSummary struct {
+	TargetPercent        float64 `json:"target_percent"`
+	AttainmentPercent    float64 `json:"attainment_percent"`
+	ErrorBudgetRemaining float64 `json:"error_budget_remaining"`
+	BurnRate             float64 `json:"burn_rate"`
+	Status               string  `json:"status"`
 }
 
 // ─── Dashboard ──────────────────────────────────────────────────────────────────
 
 type DashboardResponse struct {
-	TotalTracesToday int64               `json:"total_traces_today"`
-	TotalTokensToday int64               `json:"total_tokens_today"`
-	TotalCostToday   float64             `json:"total_cost_today"`
-	AvgLatencyMs     float64             `json:"avg_latency_ms"`
-	ModelsOnline     int                 `json:"models_online"`
-	ModelsTotal      int                 `json:"models_total"`
-	TokenTimeSeries  []TimeSeriesPoint   `json:"token_time_series"`
-	CostTimeSeries   []TimeSeriesPoint   `json:"cost_time_series"`
-	TopModels        []ModelUsageSummary `json:"top_models"`
-	RecentTraces     []TraceResponse     `json:"recent_traces"`
-	ActiveAlerts     []AlertResponse     `json:"active_alerts"`
+	TotalTracesToday     int64               `json:"total_traces_today"`
+	TotalTokensToday     int64               `json:"total_tokens_today"`
+	TotalCostToday       float64             `json:"total_cost_today"`
+	AvgLatencyMs         float64             `json:"avg_latency_ms"`
+	ModelsOnline         int                 `json:"models_online"`
+	ModelsTotal          int                 `json:"models_total"`
+	HealthScore          int                 `json:"health_score"`
+	CriticalAlertCount   int                 `json:"critical_alert_count"`
+	ActiveIncidentCount  int                 `json:"active_incident_count"`
+	SLOBurnSummary       SLOBurnSummary      `json:"slo_burn_summary"`
+	LastUpdatedAt        string              `json:"last_updated_at"`
+	DataFreshnessSeconds int                 `json:"data_freshness_seconds"`
+	TokenTimeSeries      []TimeSeriesPoint   `json:"token_time_series"`
+	CostTimeSeries       []TimeSeriesPoint   `json:"cost_time_series"`
+	TopModels            []ModelUsageSummary `json:"top_models"`
+	RecentTraces         []TraceResponse     `json:"recent_traces"`
+	ActiveAlerts         []AlertResponse     `json:"active_alerts"`
 }
 
 type TimeSeriesPoint struct {

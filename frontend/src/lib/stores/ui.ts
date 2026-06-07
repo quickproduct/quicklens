@@ -45,3 +45,27 @@ export const globalLoading = writable<boolean>(false);
 
 /* ── Connection Status ─────────────────────────────────────── */
 export const wsConnected = writable<boolean>(false);
+
+export interface WebSocketChannelState {
+	connected: boolean;
+	reconnectAttempt: number;
+	lastEventAt: string | null;
+	paused: boolean;
+}
+
+export const wsChannels = writable<Record<string, WebSocketChannelState>>({});
+
+export function setWsChannelState(channel: string, patch: Partial<WebSocketChannelState>): void {
+	wsChannels.update((channels) => {
+		const current = channels[channel] || {
+			connected: false,
+			reconnectAttempt: 0,
+			lastEventAt: null,
+			paused: false
+		};
+		return {
+			...channels,
+			[channel]: { ...current, ...patch }
+		};
+	});
+}

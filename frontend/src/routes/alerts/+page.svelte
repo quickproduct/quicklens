@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { getAlerts, acknowledgeAlert, getRules, createRule, deleteRule, updateRule, type Alert, type AlertRule } from '$api/alerts';
+	import { createIncident } from '$api/operations';
 	import { addToast } from '$stores/ui';
 	import Badge from '$components/shared/Badge.svelte';
 	import EmptyState from '$components/shared/EmptyState.svelte';
 	import { createWebSocket } from '$lib/websocket/client';
-	import { Bell, ShieldAlert, Plus, Trash2, Check, X, ShieldCheck } from 'lucide-svelte';
+	import { Bell, ShieldAlert, Plus, Trash2, Check, X, ShieldCheck, ExternalLink } from 'lucide-svelte';
 
 	let alerts = $state([] as Alert[]);
 	let rules = $state([] as AlertRule[]);
@@ -55,6 +56,26 @@
 		} catch (err) {
 			console.error(err);
 			addToast('Failed to acknowledge alert.', 'error');
+		}
+	}
+
+	async function handleDeclareIncident(alert: Alert) {
+		try {
+			await createIncident({
+				title: alert.message,
+				severity: alert.severity,
+				alert_id: alert.id,
+				model_id: alert.model_id,
+				service_id: alert.service_id,
+				owner_id: alert.owner_id,
+				runbook_url: alert.runbook_url,
+				summary: 'Declared from Alert Center.'
+			});
+			addToast('Incident declared.', 'success');
+			loadAlertsAndRules();
+		} catch (err) {
+			console.error(err);
+			addToast('Failed to declare incident.', 'error');
 		}
 	}
 
@@ -214,6 +235,11 @@
 										<span class="alert-time text-xs text-muted">{formatDateTime(alert.created_at)}</span>
 									</div>
 									<p class="alert-msg">{alert.message}</p>
+									<div class="alert-context-row">
+										<span>Status: {alert.status || (alert.acknowledged ? 'acknowledged' : 'open')}</span>
+										<span>Owner: {alert.owner_id || 'Unassigned'}</span>
+										<span>Service: {alert.service_id || alert.model_id || 'Unmapped'}</span>
+									</div>
 									<div class="alert-actions">
 										{#if !alert.acknowledged}
 											<button class="ql-btn-secondary ack-btn" onclick={() => handleAcknowledge(alert.id)}>
@@ -221,6 +247,13 @@
 											</button>
 										{:else}
 											<span class="status-label-acked">Acknowledged</span>
+										{/if}
+										{#if !alert.incident_id}
+											<button class="ql-btn-secondary ack-btn" onclick={() => handleDeclareIncident(alert)}>
+												<ExternalLink size={14} /> Declare Incident
+											</button>
+										{:else}
+											<a class="incident-link" href="/incidents">Incident linked</a>
 										{/if}
 									</div>
 								</div>
@@ -550,9 +583,25 @@
 		word-break: break-word;
 	}
 
+	.alert-context-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.375rem;
+	}
+
+	.alert-context-row span {
+		padding: 0.2rem 0.45rem;
+		border: 1px solid var(--ql-border);
+		border-radius: 999px;
+		color: var(--ql-text-muted);
+		font-size: 0.72rem;
+	}
+
 	.alert-actions {
 		display: flex;
 		justify-content: flex-end;
+		gap: 0.5rem;
+		flex-wrap: wrap;
 	}
 
 	.ack-btn {
@@ -567,6 +616,13 @@
 		font-size: 0.75rem;
 		color: var(--ql-text-muted);
 		font-weight: 500;
+	}
+
+	.incident-link {
+		color: var(--ql-accent);
+		font-size: 0.75rem;
+		text-decoration: none;
+		font-weight: 700;
 	}
 
 	.text-center { text-align: center; }

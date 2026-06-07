@@ -1,4 +1,4 @@
-import { wsConnected } from '$stores/ui';
+import { setWsChannelState, wsConnected } from '$stores/ui';
 
 export interface WebSocketClient {
 	send: (data: unknown) => void;
@@ -40,6 +40,7 @@ export function createWebSocket(
 			ws.onopen = () => {
 				reconnectAttempt = 0;
 				wsConnected.set(true);
+				setWsChannelState(channel, { connected: true, reconnectAttempt: 0 });
 				onOpen?.();
 
 				// Start ping
@@ -54,14 +55,17 @@ export function createWebSocket(
 				try {
 					const data = JSON.parse(event.data);
 					if (data.type === 'pong') return;
+					setWsChannelState(channel, { lastEventAt: new Date().toISOString() });
 					onMessage(data);
 				} catch {
+					setWsChannelState(channel, { lastEventAt: new Date().toISOString() });
 					onMessage(event.data);
 				}
 			};
 
 			ws.onclose = () => {
 				wsConnected.set(false);
+				setWsChannelState(channel, { connected: false });
 				cleanup();
 				onClose?.();
 				scheduleReconnect();
@@ -69,6 +73,7 @@ export function createWebSocket(
 
 			ws.onerror = () => {
 				wsConnected.set(false);
+				setWsChannelState(channel, { connected: false });
 			};
 		} catch {
 			scheduleReconnect();
@@ -87,6 +92,7 @@ export function createWebSocket(
 
 		const delay = Math.min(baseDelay * Math.pow(2, reconnectAttempt), maxReconnectDelay);
 		reconnectAttempt++;
+		setWsChannelState(channel, { reconnectAttempt });
 
 		reconnectTimer = setTimeout(() => {
 			connect();
@@ -112,6 +118,7 @@ export function createWebSocket(
 			ws = null;
 		}
 		wsConnected.set(false);
+		setWsChannelState(channel, { connected: false, paused: true });
 	}
 
 	// Auto-connect

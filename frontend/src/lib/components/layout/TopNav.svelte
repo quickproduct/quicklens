@@ -2,12 +2,14 @@
 	import { page } from '$app/stores';
 	import { currentUser, logout } from '$stores/auth';
 	import { wsConnected } from '$stores/ui';
-	import { User, LogOut, ChevronDown } from 'lucide-svelte';
+	import CommandPalette from './CommandPalette.svelte';
+	import { Bell, ChevronDown, Command, LogOut, Search, User } from 'lucide-svelte';
 
 	let currentPath = $state('/');
 	let connected = $state(false);
 	let userName = $state('User');
 	let showDropdown = $state(false);
+	let paletteOpen = $state(false);
 
 	$effect(() => {
 		const unsub = page.subscribe((p) => {
@@ -29,16 +31,27 @@
 	});
 
 	function getPageTitle(path: string): string {
-		if (path === '/') return 'Dashboard';
-		if (path.startsWith('/models')) return 'Models';
+		if (path === '/') return 'Overview';
+		if (path.startsWith('/monitoring')) return 'Monitoring';
+		if (path.startsWith('/models')) return 'Monitoring';
 		if (path.startsWith('/traces/')) return 'Trace Detail';
 		if (path.startsWith('/traces')) return 'Traces';
 		if (path.startsWith('/prompts')) return 'Prompts';
 		if (path.startsWith('/logs')) return 'Live Logs';
 		if (path.startsWith('/evaluations')) return 'Evaluations';
 		if (path.startsWith('/alerts')) return 'Alerts';
+		if (path.startsWith('/incidents')) return 'Incidents';
+		if (path.startsWith('/analytics')) return 'Analytics';
+		if (path.startsWith('/reports')) return 'Reports';
 		if (path.startsWith('/settings')) return 'Settings';
 		return 'QuickLens';
+	}
+
+	function getBreadcrumbs(path: string): string[] {
+		if (path === '/') return ['Operations', 'Overview'];
+		if (path.startsWith('/models') || path.startsWith('/prompts') || path.startsWith('/evaluations')) return ['Operations', 'Monitoring'];
+		if (path.startsWith('/traces/')) return ['Operations', 'Traces', 'Trace Detail'];
+		return ['Operations', getPageTitle(path)];
 	}
 
 	function handleLogout() {
@@ -51,21 +64,52 @@
 			showDropdown = false;
 		}
 	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+			event.preventDefault();
+			paletteOpen = true;
+		}
+	}
 </script>
 
-<svelte:window onclick={handleClickOutside} />
+<svelte:window onclick={handleClickOutside} onkeydown={handleKeydown} />
 
 <header class="topnav">
 	<div class="topnav-left">
+		<nav class="breadcrumbs" aria-label="Breadcrumb">
+			{#each getBreadcrumbs(currentPath) as crumb, index}
+				<span>{crumb}</span>
+				{#if index < getBreadcrumbs(currentPath).length - 1}
+					<span class="crumb-sep">/</span>
+				{/if}
+			{/each}
+		</nav>
 		<h1 class="page-title">{getPageTitle(currentPath)}</h1>
 	</div>
 
 	<div class="topnav-right">
+		<button class="command-trigger" type="button" onclick={() => (paletteOpen = true)}>
+			<Search size={15} />
+			<span>Search or command</span>
+			<kbd><Command size={11} />K</kbd>
+		</button>
+
+		<select class="env-switcher" aria-label="Environment">
+			<option>Production</option>
+			<option>Staging</option>
+			<option>Development</option>
+		</select>
+
 		<!-- Connection Status -->
 		<div class="connection-status" title={connected ? 'Connected' : 'Disconnected'}>
 			<span class="status-dot" class:connected></span>
 			<span class="status-text">{connected ? 'Live' : 'Offline'}</span>
 		</div>
+
+		<a class="notification-btn" href="/alerts" title="Notification center" aria-label="Notification center">
+			<Bell size={17} />
+		</a>
 
 		<!-- User Dropdown -->
 		<div class="user-dropdown-wrapper">
@@ -97,6 +141,8 @@
 	</div>
 </header>
 
+<CommandPalette open={paletteOpen} onClose={() => (paletteOpen = false)} />
+
 <style>
 	.topnav {
 		height: var(--ql-topnav-height);
@@ -114,8 +160,22 @@
 
 	.topnav-left {
 		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: 2px;
+		min-width: 0;
+	}
+
+	.breadcrumbs {
+		display: flex;
 		align-items: center;
-		gap: 16px;
+		gap: 0.35rem;
+		color: var(--ql-text-muted);
+		font-size: 0.72rem;
+	}
+
+	.crumb-sep {
+		opacity: 0.55;
 	}
 
 	.page-title {
@@ -128,7 +188,56 @@
 	.topnav-right {
 		display: flex;
 		align-items: center;
-		gap: 20px;
+		gap: 12px;
+	}
+
+	.command-trigger,
+	.notification-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--ql-border);
+		border-radius: 6px;
+		background: var(--ql-surface);
+		color: var(--ql-text-muted);
+	}
+
+	.command-trigger {
+		gap: 0.5rem;
+		min-width: 240px;
+		padding: 0.45rem 0.625rem;
+		font-family: var(--ql-font-ui);
+		font-size: 0.8rem;
+		cursor: pointer;
+	}
+
+	.command-trigger kbd {
+		margin-left: auto;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.15rem;
+		padding: 0.1rem 0.3rem;
+		border: 1px solid var(--ql-border);
+		border-radius: 4px;
+		color: var(--ql-text-muted);
+		font-size: 0.7rem;
+	}
+
+	.env-switcher {
+		height: 32px;
+		border: 1px solid var(--ql-border);
+		border-radius: 6px;
+		background: var(--ql-surface);
+		color: var(--ql-text);
+		font: inherit;
+		font-size: 0.8rem;
+		padding: 0 0.5rem;
+	}
+
+	.notification-btn {
+		width: 32px;
+		height: 32px;
+		text-decoration: none;
 	}
 
 	.connection-status {
@@ -140,6 +249,33 @@
 		background: var(--ql-surface);
 		border: 1px solid var(--ql-border);
 		font-size: 0.75rem;
+	}
+
+	@media (max-width: 980px) {
+		.command-trigger span,
+		.command-trigger kbd,
+		.env-switcher {
+			display: none;
+		}
+
+		.command-trigger {
+			min-width: 32px;
+			width: 32px;
+			height: 32px;
+			padding: 0;
+		}
+	}
+
+	@media (max-width: 720px) {
+		.topnav {
+			padding: 0 12px;
+		}
+
+		.breadcrumbs,
+		.user-dropdown-name,
+		.connection-status {
+			display: none;
+		}
 	}
 
 	.status-dot {

@@ -106,6 +106,17 @@ func main() {
 	mux.HandleFunc("PUT /api/v1/alert-rules/{rule_id}", handlers.AuthMiddleware(handlers.UpdateRuleHandler))
 	mux.HandleFunc("DELETE /api/v1/alert-rules/{rule_id}", handlers.AuthMiddleware(handlers.DeleteRuleHandler))
 
+	// Operations API
+	mux.HandleFunc("GET /api/v1/incidents", handlers.AuthMiddleware(handlers.ListIncidentsHandler))
+	mux.HandleFunc("POST /api/v1/incidents", handlers.AuthMiddleware(handlers.CreateIncidentHandler))
+	mux.HandleFunc("PUT /api/v1/incidents/{incident_id}", handlers.AuthMiddleware(handlers.UpdateIncidentHandler))
+	mux.HandleFunc("GET /api/v1/incidents/{incident_id}/events", handlers.AuthMiddleware(handlers.ListIncidentEventsHandler))
+	mux.HandleFunc("GET /api/v1/audit-logs", handlers.AuthMiddleware(handlers.ListAuditLogsHandler))
+	mux.HandleFunc("GET /api/v1/saved-views", handlers.AuthMiddleware(handlers.ListSavedViewsHandler))
+	mux.HandleFunc("GET /api/v1/slo-definitions", handlers.AuthMiddleware(handlers.ListSLODefinitionsHandler))
+	mux.HandleFunc("GET /api/v1/notification-rules", handlers.AuthMiddleware(handlers.ListNotificationRulesHandler))
+	mux.HandleFunc("GET /api/v1/dashboard-layouts", handlers.AuthMiddleware(handlers.ListDashboardLayoutsHandler))
+
 	// Logs API
 	mux.HandleFunc("GET /api/v1/logs", handlers.AuthMiddleware(handlers.SearchLogsHandler))
 

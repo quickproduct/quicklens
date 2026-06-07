@@ -6,25 +6,24 @@
 		LayoutDashboard,
 		Cpu,
 		GitBranch,
-		MessageSquare,
-		ScrollText,
-		Star,
 		Bell,
+		Flame,
+		BarChart3,
+		FileText,
 		Settings,
 		ChevronLeft,
 		ChevronRight,
 		LogOut,
-		Search as SearchIcon
 	} from 'lucide-svelte';
 
 	const navItems = [
-		{ href: '/', label: 'Dashboard', icon: LayoutDashboard },
-		{ href: '/models', label: 'Models', icon: Cpu },
+		{ href: '/', label: 'Overview', icon: LayoutDashboard },
+		{ href: '/monitoring', label: 'Monitoring', icon: Cpu },
 		{ href: '/traces', label: 'Traces', icon: GitBranch },
-		{ href: '/prompts', label: 'Prompts', icon: MessageSquare },
-		{ href: '/logs', label: 'Logs', icon: ScrollText },
-		{ href: '/evaluations', label: 'Evaluations', icon: Star },
 		{ href: '/alerts', label: 'Alerts', icon: Bell },
+		{ href: '/incidents', label: 'Incidents', icon: Flame },
+		{ href: '/analytics', label: 'Analytics', icon: BarChart3 },
+		{ href: '/reports', label: 'Reports', icon: FileText },
 		{ href: '/settings', label: 'Settings', icon: Settings }
 	];
 

@@ -21,6 +21,7 @@
 	let startDate = $state('');
 	let endDate = $state('');
 	let loading = $state(true);
+	let filterDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 	async function loadFiltersData() {
 		try {
@@ -56,6 +57,11 @@
 
 	function handleFilterChange() {
 		loadTraces(1);
+	}
+
+	function handleSearchInput() {
+		if (filterDebounceTimer) clearTimeout(filterDebounceTimer);
+		filterDebounceTimer = setTimeout(() => loadTraces(1), 350);
 	}
 
 	async function handleDelete(id: string, event: MouseEvent) {
@@ -111,7 +117,7 @@
 						class="search-input"
 						placeholder="Search by trace name..."
 						bind:value={searchQuery}
-						oninput={handleFilterChange}
+						oninput={handleSearchInput}
 					/>
 				</div>
 			</div>
