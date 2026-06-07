@@ -1,0 +1,1 @@
+# QuickLens MCP Server

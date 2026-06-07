@@ -1,0 +1,1 @@
+import{c as o,a,b as s}from"./BSwcq3lv.js";function i(){return a("/api/v1/models")}function r(e){return o("/api/v1/models",e)}function d(e){return s(`/api/v1/models/${e}`)}function n(){return o("/api/v1/models/discover")}export{d as a,r as c,n as d,i as g};
