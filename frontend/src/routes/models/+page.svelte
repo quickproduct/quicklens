@@ -447,30 +447,6 @@
 		width: max-content;
 	}
 
-	.provider-openai {
-		background-color: rgba(16, 163, 127, 0.1);
-		color: #10a37f;
-		border: 1px solid rgba(16, 163, 127, 0.2);
-	}
-
-	.provider-anthropic {
-		background-color: rgba(241, 151, 120, 0.1);
-		color: #f19778;
-		border: 1px solid rgba(241, 151, 120, 0.2);
-	}
-
-	.provider-google {
-		background-color: rgba(59, 130, 246, 0.1);
-		color: #3b82f6;
-		border: 1px solid rgba(59, 130, 246, 0.2);
-	}
-
-	.provider-ollama {
-		background-color: rgba(255, 255, 255, 0.1);
-		color: #e2e8f0;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-	}
-
 	.model-header-actions {
 		display: flex;
 		align-items: center;

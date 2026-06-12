@@ -1,58 +1,6 @@
 @import 'tailwindcss';
 
-/* ═══════════════════════════════════════════════════════════════
-   QuickLens Design System — Premium Dark Mode
-   ═══════════════════════════════════════════════════════════════ */
-
-:root {
-	/* Core palette */
-	--ql-bg: #0f1117;
-	--ql-surface: #1a1d2e;
-	--ql-surface-2: #242842;
-	--ql-border: #2e3348;
-	--ql-text: #e2e8f0;
-	--ql-text-muted: #94a3b8;
-
-	/* Accent */
-	--ql-accent: #10b981;
-	--ql-accent-hover: #34d399;
-	--ql-accent-glow: rgba(16, 185, 129, 0.15);
-	--ql-accent-subtle: rgba(16, 185, 129, 0.08);
-
-	/* Status */
-	--ql-success: #22c55e;
-	--ql-warning: #f59e0b;
-	--ql-danger: #ef4444;
-	--ql-info: #3b82f6;
-	--ql-critical: #f43f5e;
-	--ql-healthy: #22c55e;
-	--ql-stale: #f59e0b;
-	--ql-unknown: #64748b;
-	--ql-chart-1: #38bdf8;
-	--ql-chart-2: #34d399;
-	--ql-chart-3: #fbbf24;
-	--ql-chart-4: #fb7185;
-	--ql-chart-5: #a78bfa;
-
-	/* Fonts */
-	--ql-font-ui: 'Inter', system-ui, -apple-system, sans-serif;
-	--ql-font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-
-	/* Spacing */
-	--ql-sidebar-width: 260px;
-	--ql-sidebar-collapsed: 68px;
-	--ql-topnav-height: 56px;
-
-	/* Radii */
-	--ql-radius: 8px;
-	--ql-radius-sm: 6px;
-	--ql-radius-lg: 16px;
-
-	/* Shadows */
-	--ql-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2);
-	--ql-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.4), 0 8px 32px rgba(0, 0, 0, 0.3);
-	--ql-shadow-glow: 0 0 20px rgba(16, 185, 129, 0.15);
-}
+@import './lib/theme.css';
 
 /* ── Base ───────────────────────────────────────────────────── */
 * {

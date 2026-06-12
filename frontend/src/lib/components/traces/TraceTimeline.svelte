@@ -101,10 +101,17 @@
 
 <style>
 	.timeline-card {
+		--timeline-label-width: 180px;
 		padding: 1.25rem;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+	}
+
+	@media (max-width: 768px) {
+		.timeline-card {
+			--timeline-label-width: 100px;
+		}
 	}
 
 	.timeline-header {
@@ -138,7 +145,7 @@
 		position: absolute;
 		top: 0;
 		bottom: 0;
-		left: 180px; /* offset label width */
+		left: var(--timeline-label-width); /* offset label width */
 		right: 0;
 		display: flex;
 		justify-content: space-between;
@@ -171,7 +178,7 @@
 	}
 
 	.span-label {
-		width: 180px;
+		width: var(--timeline-label-width);
 		flex-shrink: 0;
 		display: flex;
 		flex-direction: column;
@@ -237,7 +244,7 @@
 	.timeline-legend {
 		display: flex;
 		justify-content: space-between;
-		padding-left: 180px; /* align with bars */
+		padding-left: var(--timeline-label-width); /* align with bars */
 		font-size: 0.65rem;
 		color: var(--ql-text-muted);
 		font-weight: 500;

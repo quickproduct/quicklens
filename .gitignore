@@ -29,3 +29,6 @@ Thumbs.db
 # Logs
 logs/
 *.log
+
+# Embedded frontend build staged for go:embed (generated)
+backend/internal/static/build/

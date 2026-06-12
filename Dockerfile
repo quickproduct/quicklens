@@ -21,8 +21,8 @@ WORKDIR /app/backend
 COPY backend/go.mod backend/go.sum ./
 RUN go mod download
 COPY backend/ ./
-COPY --from=frontend-builder /app/backend/frontend/build ./frontend/build
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o quicklens-backend main.go
+COPY --from=frontend-builder /app/backend/frontend/build ./internal/static/build
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o quicklens-backend ./cmd/server
 
 # Stage 3: Runtime
 FROM alpine:3.19 AS runtime

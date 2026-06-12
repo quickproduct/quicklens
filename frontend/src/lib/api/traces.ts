@@ -7,19 +7,18 @@ export interface SpanResponse {
 	name: string;
 	type: 'llm' | 'retrieval' | 'embedding' | 'tool' | 'agent' | 'chain' | 'other';
 	status: 'ok' | 'error';
-	start_time: string;
-	end_time?: string;
+	started_at: string;
+	ended_at?: string;
 	duration_ms: number;
-	model?: string;
-	input?: unknown;
-	output?: unknown;
-	error?: string;
+	model_id?: string;
+	provider?: string;
+	input?: string;
+	output?: string;
+	error_message?: string;
 	metadata?: Record<string, unknown>;
-	tokens?: {
-		prompt: number;
-		completion: number;
-		total: number;
-	};
+	prompt_tokens: number;
+	completion_tokens: number;
+	total_tokens: number;
 	cost?: number;
 	evaluations?: Array<{
 		id: string;

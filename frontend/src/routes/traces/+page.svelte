@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { getTraces, deleteTrace, type TraceListItem } from '$api/traces';
 	import { getModels, type Model } from '$api/models';
 	import { addToast } from '$stores/ui';
@@ -196,7 +197,7 @@
 					</thead>
 					<tbody>
 						{#each traces as trace (trace.id)}
-							<tr onclick={() => window.location.href = `/traces/${trace.id}`} class="clickable-row">
+							<tr onclick={() => goto(`/traces/${trace.id}`)} class="clickable-row">
 								<td class="trace-name font-semibold" title={trace.name}>
 									{trace.name}
 								</td>

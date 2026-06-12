@@ -253,8 +253,7 @@
 
 	@media (max-width: 980px) {
 		.command-trigger span,
-		.command-trigger kbd,
-		.env-switcher {
+		.command-trigger kbd {
 			display: none;
 		}
 
@@ -263,6 +262,14 @@
 			width: 32px;
 			height: 32px;
 			padding: 0;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.env-switcher {
+			max-width: 95px;
+			font-size: 0.75rem;
+			padding: 0 0.25rem;
 		}
 	}
 

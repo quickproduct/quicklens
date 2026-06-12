@@ -4,12 +4,8 @@
 	import { currentUser, logout } from '$stores/auth';
 	import {
 		LayoutDashboard,
-		Cpu,
 		GitBranch,
-		Bell,
-		Flame,
-		BarChart3,
-		FileText,
+		Cpu,
 		Settings,
 		ChevronLeft,
 		ChevronRight,
@@ -18,13 +14,9 @@
 
 	const navItems = [
 		{ href: '/', label: 'Overview', icon: LayoutDashboard },
-		{ href: '/monitoring', label: 'Monitoring', icon: Cpu },
-		{ href: '/traces', label: 'Traces', icon: GitBranch },
-		{ href: '/alerts', label: 'Alerts', icon: Bell },
-		{ href: '/incidents', label: 'Incidents', icon: Flame },
-		{ href: '/analytics', label: 'Analytics', icon: BarChart3 },
-		{ href: '/reports', label: 'Reports', icon: FileText },
-		{ href: '/settings', label: 'Settings', icon: Settings }
+		{ href: '/traces', label: 'Request Logs', icon: GitBranch },
+		{ href: '/models', label: 'Model Registry', icon: Cpu },
+		{ href: '/settings', label: 'Settings & Setup', icon: Settings }
 	];
 
 	let collapsed = $state(false);
@@ -152,10 +144,6 @@
 		display: flex;
 		flex-direction: column;
 		transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-		position: fixed;
-		left: 0;
-		top: 0;
-		z-index: 40;
 		overflow: hidden;
 	}
 

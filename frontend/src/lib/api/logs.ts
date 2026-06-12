@@ -4,18 +4,16 @@ export interface LogEntry {
 	id: string;
 	trace_id?: string;
 	span_id?: string;
-	model?: string;
+	model_name?: string;
 	provider?: string;
 	status: 'ok' | 'error';
 	duration_ms: number;
-	tokens_prompt: number;
-	tokens_completion: number;
-	tokens_total: number;
-	cost: number;
+	prompt_tokens: number;
+	completion_tokens: number;
 	input_preview: string;
 	output_preview: string;
-	error?: string;
-	timestamp: string;
+	error_message?: string;
+	created_at: string;
 }
 
 export interface LogSearchParams {

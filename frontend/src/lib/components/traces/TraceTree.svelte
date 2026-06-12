@@ -59,17 +59,11 @@
 			<div
 				class="tree-node-row span-type-{span.type.toLowerCase()}"
 				class:selected={isSelected}
-				style="padding-left: {depth * 1.5}rem"
 				onclick={() => onSelect(span.id)}
 				role="button"
 				tabindex="0"
 				onkeydown={(e) => e.key === 'Enter' && onSelect(span.id)}
 			>
-				<!-- Connecting lines guidelines -->
-				{#if depth > 0}
-					<div class="guideline-connector" style="left: {(depth - 0.5) * 1.5}rem"></div>
-				{/if}
-
 				<!-- Expand/Collapse toggle -->
 				<div class="toggle-space">
 					{#if hasChildren}
@@ -114,13 +108,14 @@
 
 			<!-- Recursive Children rendering -->
 			{#if hasChildren && !isCollapsed}
-				<TraceTree
-					spans={span.children}
-					{selectedSpanId}
-					{onSelect}
-					depth={depth + 1}
-				/>
-
+				<div class="tree-children-container">
+					<TraceTree
+						spans={span.children}
+						{selectedSpanId}
+						{onSelect}
+						depth={depth + 1}
+					/>
+				</div>
 			{/if}
 		</div>
 	{/each}
@@ -166,13 +161,10 @@
 		background-color: rgba(16, 185, 129, 0.08);
 	}
 
-	.guideline-connector {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		width: 1px;
-		background-color: var(--ql-border);
-		pointer-events: none;
+	.tree-children-container {
+		position: relative;
+		margin-left: 1.625rem; /* Align perfectly with center of parent toggle */
+		border-left: 1.5px dashed var(--ql-border);
 	}
 
 	.toggle-space {

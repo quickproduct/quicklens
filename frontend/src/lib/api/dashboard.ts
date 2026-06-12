@@ -49,32 +49,20 @@ export interface AlertSummary {
 	created_at: string;
 }
 
-export interface SLOBurnSummary {
-	target_percent: number;
-	attainment_percent: number;
-	error_budget_remaining: number;
-	burn_rate: number;
-	status: string;
-}
-
 export interface DashboardResponse {
 	total_traces_today: number;
 	total_tokens_today: number;
 	total_cost_today: number;
 	avg_latency_ms: number;
+	success_rate_today: number;
 	models_online: number;
 	models_total: number;
-	health_score: number;
-	critical_alert_count: number;
-	active_incident_count: number;
-	slo_burn_summary: SLOBurnSummary;
 	last_updated_at: string;
 	data_freshness_seconds: number;
 	token_time_series: TimeSeriesPoint[];
 	cost_time_series: TimeSeriesPoint[];
 	top_models: ModelUsageSummary[];
 	recent_traces: TraceSummary[];
-	active_alerts: AlertSummary[];
 }
 
 export function getDashboard(): Promise<DashboardResponse> {
